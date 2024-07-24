@@ -10,7 +10,7 @@ set.seed(21)
 
 # Load data
 
-data <- read_csv("replication_data.csv") %>%
+data <- read_csv("Freitas2019_replicationdata.csv") %>%
   clean_names()
 
 # Prepare data ----------------
