@@ -80,16 +80,21 @@ paired_data$condition <- as.factor(paired_data$condition)
 
 paired_data$condition <- forcats::fct_relevel(paired_data$condition, "atp_kg_total", "placebo_kg_total")
 
-results <- t.test(total_weight ~ condition, paired_data, 
-                  alternative = "two.sided", paired = TRUE, conf.level = 0.95) %>%
-  tidy()
+#not working anymore
+#results <- t.test(total_weight ~ condition, paired_data, 
+#                  alternative = "two.sided", paired = TRUE, conf.level = 0.95) %>%
+#  tidy()
+#results
+
+results <- t.test(rep_data$atp_kg_total, rep_data$placebo_kg_total, 
+       alternative = "two.sided", paired = TRUE, conf.level = 0.95)
 results
 
 # Analyse the replication ------
 
 ## Calculate Original ES --------
 
-#Original descriptives
+#Original descriptive
 
 orig_values <- data.frame(
   ori_pval = 0.005,
@@ -111,11 +116,21 @@ ori_tval <- qt(quantile, df = 10)
 ori_dz <- d.dep.t.diff.t(t = ori_tval, n = 11, a = 0.05)
 ori_dz
 
+ori_dav <- d.dep.t.avg(m1 = orig_values$atp_mean, m2 = orig_values$placebo_mean, 
+            sd1 = orig_values$atp_sd, sd2 = orig_values$placebo_sd,
+            n = 11, a = 0.05)
+ori_dav
+
 ## Calculate replication ES ------
 
 rep_dz <- d.dep.t.diff(mdiff = summary_rep$mean_diff[1], sddiff = summary_rep$sd_diff[1], 
                        n = summary_rep$count[1], a = 0.05)
 rep_dz
+
+rep_dav <- d.dep.t.avg(m1 = summary_rep$mean[1], m2 = summary_rep$mean[2], 
+                       sd1 = summary_rep$sd[1], sd2 = summary_rep$sd[2],
+                       n = 14, a = 0.05)
+rep_dav
 
 ## Z-test  --------
 
@@ -128,12 +143,12 @@ rep_test <- compare_smd(
   alternative = "greater")
 rep_test
 
-## Z-test reported --------
+## Z-test reported dav --------
 
 rep_test <- compare_smd(
   smd1 = 0.73,
   n1 = orig_values$N,
-  smd2 = rep_dz$d,
+  smd2 = rep_dav$d,
   n2 = summary_rep$count[1],
   paired = TRUE,
   alternative = "greater")
